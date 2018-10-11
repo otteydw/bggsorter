@@ -41,7 +41,24 @@ bgg = BGGClient()
 # print mygame.name
 # print mygame.id
 
+gameplaycount_d = {}
+
 myplays = bgg.plays(username)
 
 for item in myplays:
-    print '%d %s' % (item.game_id, item.game_name)
+    # print '%d %s' % (item.game_id, item.game_name)
+    if not item.game_id in gameplaycount_d:
+        gameplaycount_d[item.game_id] = 1
+    else:
+        gameplaycount_d[item.game_id] += 1
+
+# print gameplaycount_d
+
+# for game in gameplaycount_d:
+#     print game
+
+for game in sorted(gameplaycount_d.items(), key=lambda x: x[1]):
+    # print(game)
+    print(bgg.game(game_id=game.key).name)
+
+# print(bgg.game(game_id=36218).name)
