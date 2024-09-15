@@ -71,41 +71,37 @@ def sort_games():
     unsorted_games = user_data["unsorted"]
     sorted_games = user_data["sorted"]
 
+    if not unsorted_games:
+        return "All games have been sorted!"
+
     # Ensure the sorted list will contain at least one game to start.
-    if unsorted_games and not sorted_games:
+    if not sorted_games:
         sorted_games.append(unsorted_games.pop())
 
-    if unsorted_games:
-        game = unsorted_games[-1]
+    game = unsorted_games[-1]
 
-        if request.method == "GET":
-            low = 0
-            high = len(sorted_games) - 1
-        else:
-            low = int(request.form.get("low"))
-            high = int(request.form.get("high"))
+    low = int(request.form.get("low", 0))
+    high = int(request.form.get("high", len(sorted_games) - 1))
 
-        if low <= high:
-            mid = (low + high) // 2
+    if low <= high:
+        mid = (low + high) // 2
 
-            # This is where we ask the user to compare game with sorted_games[mid]
-            return render_template(
-                "sort_games.html",
-                username=username,
-                current_game=game,
-                comparison_game=sorted_games[mid],
-                low=low,
-                mid=mid,
-                high=high,
-                sorted_games=sorted_games,
-            )
-        else:
-            sorted_games.insert(low, game)
-            unsorted_games.pop()  # Remove the last game from the list
-            save_data(username, user_data)
-            return redirect(url_for("sort_games", username=username))
+        # This is where we ask the user to compare game with sorted_games[mid]
+        return render_template(
+            "sort_games.html",
+            username=username,
+            current_game=game,
+            comparison_game=sorted_games[mid],
+            low=low,
+            mid=mid,
+            high=high,
+            sorted_games=sorted_games,
+        )
     else:
-        return "All games have been sorted!"
+        sorted_games.insert(low, game)
+        unsorted_games.pop()
+        save_data(username, user_data)
+        return redirect(url_for("sort_games", username=username))
 
 
 if __name__ == "__main__":
