@@ -61,6 +61,22 @@ def games():
     return render_template("games.html", games=all_games)
 
 
+@app.route("/top_games")
+def top_games():
+    username = request.args.get("username")
+    if not username:
+        return "Username required", 400
+
+    user_data = load_data(username)
+
+    max = int(request.args.get("max", None))
+    if max is None:
+        title = f"Top Games for {username}ß"
+    else:
+        title = f"Top {max} Games for {username}"
+    return render_template("top_games.html", title=title, max=max, games=user_data["sorted"])
+
+
 @app.route("/sort", methods=["GET", "POST"])
 def sort_games():
     username = request.args.get("username") or request.form.get("username")
