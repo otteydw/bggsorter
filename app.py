@@ -1,7 +1,7 @@
 import logging
-import xml.etree.ElementTree as ET
 
 import requests
+from defusedxml.ElementTree import fromstring as defused_fromstring
 from flask import Flask, render_template
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -40,7 +40,7 @@ def get_games_played_for_user(username):
 # Helper function to parse the XML data returned by the BGG API
 def parse_bgg_xml(xml_data):
     games = []
-    root = ET.fromstring(xml_data)
+    root = defused_fromstring(xml_data)  # Use defusedxml for parsing
 
     for item in root.findall("item"):
         game_id = item.get("objectid")
