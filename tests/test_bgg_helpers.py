@@ -1,10 +1,10 @@
 from unittest.mock import patch
 
-from app import get_games_played_for_user, parse_bgg_xml
+from bgg_helpers import get_games_played_for_user, parse_bgg_xml
 from tests.test_data import MOCK_PLAYED_GAMES_XML
 
 
-@patch("app.session.get")
+@patch("bgg_helpers.session.get")
 def test_get_games_played_for_user(mock_get):
     # Mock the response object
     class MockResponse:

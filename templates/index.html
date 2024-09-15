@@ -3,21 +3,14 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Board Games Played</title>
+        <title>Board Game Selector</title>
     </head>
     <body>
-        <h1>Games You've Played</h1>
-        <ul>
-            {% for game in games %}
-                <li>
-                    <h2>{{ game.name }}</h2>
-                    {% if game.image %}
-                        <img src="{{ game.image }}" alt="{{ game.name }}" style="width:200px;" />
-                    {% else %}
-                        <p>No image available</p>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+        <h1>Enter Your BGG Username</h1>
+        <form action="/" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <button type="submit">Submit</button>
+        </form>
     </body>
 </html>

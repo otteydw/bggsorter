@@ -47,5 +47,5 @@ ENV/
 *.pyo
 
 # Ignore the saved state and export files
-data/save_state.json
+data/
 exported_results/

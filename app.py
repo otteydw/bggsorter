@@ -1,68 +1,56 @@
-import logging
+import json
+import os
 
-import requests
-from defusedxml.ElementTree import fromstring as defused_fromstring
-from flask import Flask, render_template
-from urllib3.exceptions import InsecureRequestWarning
+from flask import Flask, redirect, render_template, request, url_for
+
+from bgg_helpers import get_games_played_for_user
 
 app = Flask(__name__)
 
-# Configure the logging
-logging.basicConfig(level=logging.DEBUG)  # Set the logging level to DEBUG
+DATA_DIR = "data"
 
-# Create a global session for requests with SSL verification disabled
-session = requests.Session()
-session.verify = False  # Disable SSL verification
-
-# Suppress InsecureRequestWarning (optional but recommended in this case)
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+# Create the data directory if it doesn't exist
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
-# Function to get games played by a BGG user
-def get_games_played_for_user(username):
-    app.logger.debug(f"Fetching games for user: {username}")
-    url = f"https://boardgamegeek.com/xmlapi2/collection?username={username}&played=1"
-
-    try:
-        response = session.get(url)  # Use the session to make the request
-        response.raise_for_status()  # Raise an error for bad responses
-        app.logger.info(f"Received response for {username}, status code: {response.status_code}")
-
-        games = parse_bgg_xml(response.content)
-        app.logger.debug(f"Parsed {len(games)} games for user {username}")
-        return games
-
-    except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error fetching games for {username}: {e}")
-        return None
+# Load existing data from file for a specific user
+def load_data(username):
+    file_path = os.path.join(DATA_DIR, f"{username}.json")
+    if os.path.exists(file_path):
+        with open(file_path, "r") as file:
+            return json.load(file)
+    return {}
 
 
-# Helper function to parse the XML data returned by the BGG API
-def parse_bgg_xml(xml_data):
-    games = []
-    root = defused_fromstring(xml_data)  # Use defusedxml for parsing
-
-    for item in root.findall("item"):
-        game_id = item.get("objectid")
-        name = item.find("name").text
-        image = item.find("image").text if item.find("image") is not None else ""
-
-        games.append({"id": game_id, "name": name, "image": image})
-
-    app.logger.debug(f"Successfully parsed {len(games)} games from XML")
-    return games
+# Save data to file for a specific user
+def save_data(username, data):
+    file_path = os.path.join(DATA_DIR, f"{username}.json")
+    with open(file_path, "w") as file:
+        json.dump(data, file)
 
 
-# Sample route to test API call
-@app.route("/")
+# Main page route
+@app.route("/", methods=["GET", "POST"])
 def index():
-    username = "otteydw"
-    games = get_games_played_for_user(username)
+    if request.method == "POST":
+        username = request.form.get("username")
+        if username:
+            user_games = load_data(username)
+            if not user_games:
+                # Fetch and store data if not already stored
+                games = get_games_played_for_user(username)
+                if games:
+                    user_games = [game["id"] for game in games]
+                    save_data(username, user_games)
+            return redirect(url_for("show_games", username=username))
+    return render_template("index.html")
 
-    if games:
-        return render_template("index.html", games=games[:5])
-    else:
-        return "No games found or error in fetching data."
+
+# Page to show games for the user
+@app.route("/games/<username>")
+def show_games(username):
+    user_games = load_data(username)
+    return render_template("games.html", username=username, games=user_games)
 
 
 if __name__ == "__main__":
