@@ -36,7 +36,7 @@ def parse_bgg_xml(xml_data):
     try:
         root = defused_fromstring(xml_data)
         for item in root.findall("item"):
-            game_id = item.get("objectid")
+            game_id = int(item.get("objectid"))
             name = item.find("name").text
             image = item.find("image").text if item.find("image") is not None else ""
 

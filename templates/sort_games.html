@@ -1,0 +1,60 @@
+<!-- templates/sort_games.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sort Games</title>
+        <style>
+        .container { display: flex; justify-content: space-around; }
+        .game { text-align: center; }
+        .game img { max-width: 200px; height: auto; }
+        .game-name { margin-top: 10px; font-size: 1.2em; }
+        </style>
+    </head>
+    <body>
+        <h1>Choose Your Preferred Game</h1>
+        <div class="container">
+            <div class="game">
+                <form method="post" action="{{ url_for("sort_games") }}">
+                    <input type="hidden" name="username" value="{{ username }}">
+                    <input type="hidden" name="preferred_game" value="{{ current_game.id }}">
+                    <input type="hidden" name="current_game" value="{{ current_game.id }}">
+                    <input type="hidden" name="low" value="{{ low }}">
+                    <input type="hidden" name="high" value="{{ mid - 1 }}">
+                    <button type="submit" style="border: none; background: none;">
+                        <img src="{{ current_game.image }}" alt="{{ current_game.name }}">
+                    </button>
+                    <div class="game-name">{{ current_game.name }}</div>
+                </form>
+            </div>
+            {% if comparison_game %}
+                <div class="game">
+                    <form method="post" action="{{ url_for("sort_games") }}">
+                        <input type="hidden" name="username" value="{{ username }}">
+                        <input type="hidden" name="preferred_game" value="{{ comparison_game.id }}">
+                        <input type="hidden" name="current_game" value="{{ current_game.id }}">
+                        <input type="hidden" name="low" value="{{ mid + 1 }}">
+                        <input type="hidden" name="high" value="{{ high }}">
+                        <button type="submit" style="border: none; background: none;">
+                            <img src="{{ comparison_game.image }}" alt="{{ comparison_game.name }}">
+                        </button>
+                        <div class="game-name">{{ comparison_game.name }}</div>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        <h2>Debug info:</h2>
+        <p>
+            Low: {{ low }}
+            <br>
+            Mid: {{ mid }}
+            <br>
+            High: {{ high }}
+        </p>
+        <h2>Current Sorted List:</h2>
+        <ul>
+            {% for game in sorted_games %}<li>{{ loop.index - 1 }} - {{ game.name }}</li>{% endfor %}
+        </ul>
+    </body>
+</html>

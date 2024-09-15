@@ -3,13 +3,49 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Games List for {{ username }}</title>
+        <title>All Games</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px; /* Space between grid items */
+            padding: 20px;
+            list-style-type: none;
+            margin: 0;
+        }
+        .game-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .game-item img {
+            width: 100%; /* Responsive width */
+            height: auto;
+            border-radius: 4px;
+        }
+        .game-item p {
+            margin: 10px 0 0;
+            font-size: 16px;
+        }
+        </style>
     </head>
     <body>
-        <h1>Games List for {{ username }} ({{ games | length }})</h1>
-        <ul>
-            {% for game_id in games %}<li>Game ID: {{ game_id }}</li>{% endfor %}
+        <h1>All Games ({{ games | length }})</h1>
+        <ul class="game-grid">
+            {% for game in games %}
+                <li class="game-item">
+                    <img src="{{ game.image }}" alt="{{ game.name }}">
+                    <p>{{ game.name }}</p>
+                </li>
+            {% endfor %}
         </ul>
-        <a href="{{ url_for("index") }}">Back</a>
     </body>
 </html>

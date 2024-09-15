@@ -1,9 +1,12 @@
 import json
+import logging
 import os
 
 from flask import Flask, redirect, render_template, request, url_for
 
 from bgg_helpers import get_games_played_for_user
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -19,7 +22,7 @@ def load_data(username):
     if os.path.exists(file_path):
         with open(file_path, "r") as file:
             return json.load(file)
-    return {}
+    return {"unsorted": [], "sorted": []}
 
 
 # Save data to file for a specific user
@@ -29,28 +32,80 @@ def save_data(username, data):
         json.dump(data, file)
 
 
-# Main page route
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         username = request.form.get("username")
         if username:
-            user_games = load_data(username)
-            if not user_games:
+            user_data = load_data(username)
+            if not user_data["unsorted"]:
                 # Fetch and store data if not already stored
                 games = get_games_played_for_user(username)
                 if games:
-                    user_games = [game["id"] for game in games]
-                    save_data(username, user_games)
-            return redirect(url_for("show_games", username=username))
+                    user_data["unsorted"] = [
+                        {"id": game["id"], "name": game["name"], "image": game["image"]} for game in games
+                    ]
+                    save_data(username, user_data)
+            return redirect(url_for("sort_games", username=username))
     return render_template("index.html")
 
 
-# Page to show games for the user
-@app.route("/games/<username>")
-def show_games(username):
-    user_games = load_data(username)
-    return render_template("games.html", username=username, games=user_games)
+@app.route("/games")
+def games():
+    username = request.args.get("username")
+    if not username:
+        return "Username required", 400
+
+    user_data = load_data(username)
+    all_games = user_data["unsorted"] + user_data["sorted"]
+    return render_template("games.html", games=all_games)
+
+
+@app.route("/sort", methods=["GET", "POST"])
+def sort_games():
+    username = request.args.get("username") or request.form.get("username")
+    if not username:
+        return "Username is required", 400
+
+    user_data = load_data(username)
+    unsorted_games = user_data["unsorted"]
+    sorted_games = user_data["sorted"]
+
+    # Ensure the sorted list will contain at least one game to start.
+    if unsorted_games and not sorted_games:
+        sorted_games.append(unsorted_games.pop())
+
+    if unsorted_games:
+        game = unsorted_games[-1]
+
+        if request.method == "GET":
+            low = 0
+            high = len(sorted_games) - 1
+        else:
+            low = int(request.form.get("low"))
+            high = int(request.form.get("high"))
+
+        if low <= high:
+            mid = (low + high) // 2
+
+            # This is where we ask the user to compare game with sorted_games[mid]
+            return render_template(
+                "sort_games.html",
+                username=username,
+                current_game=game,
+                comparison_game=sorted_games[mid],
+                low=low,
+                mid=mid,
+                high=high,
+                sorted_games=sorted_games,
+            )
+        else:
+            sorted_games.insert(low, game)
+            unsorted_games.pop()  # Remove the last game from the list
+            save_data(username, user_data)
+            return redirect(url_for("sort_games", username=username))
+    else:
+        return "All games have been sorted!"
 
 
 if __name__ == "__main__":
