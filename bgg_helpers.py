@@ -1,13 +1,14 @@
 import logging
 
 import requests
+import requests_cache
 from defusedxml.ElementTree import fromstring as defused_fromstring
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
 # Create a global session for requests with SSL verification disabled
-session = requests.Session()
+session = requests_cache.CachedSession("bgg_cache", use_cache_dir=True)
 session.verify = False  # Disable SSL verification
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
