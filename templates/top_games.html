@@ -4,11 +4,58 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ title }}</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px; /* Space between grid items */
+            padding: 20px;
+            list-style-type: none;
+            margin: 0;
+            max-width: calc(200px * 10 + 20px * 9); /* Limit grid width to 10 columns */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .game-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .game-item img {
+            width: 100%; /* Responsive width */
+            height: 200px; /* Increase image height */
+            object-fit: cover; /* Maintain aspect ratio and cover the area */
+            border-radius: 4px;
+        }
+        .game-item p {
+            margin: 10px 0 0;
+            font-size: 16px;
+        }
+        .game-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        </style>
     </head>
     <body>
         <h1>{{ title }}</h1>
-        <ol>
-            {% for game in games[:max] %}<li>{{ game.name }}</li>{% endfor %}
-        </ol>
+        <ul class="game-grid">
+            {% for game in games %}
+                <li class="game-item">
+                    <p class="game-number">#{{ loop.index }}</p>
+                    <img src="{{ game.image }}" alt="{{ game.name }}">
+                    <p>{{ game.name }}</p>
+                </li>
+            {% endfor %}
+        </ul>
     </body>
 </html>

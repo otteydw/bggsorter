@@ -74,7 +74,7 @@ def top_games():
         title = f"Top Games for {username}ß"
     else:
         title = f"Top {max} Games for {username}"
-    return render_template("top_games.html", title=title, max=max, games=user_data["sorted"])
+    return render_template("top_games.html", title=title, max=max, games=user_data["sorted"][:max])
 
 
 @app.route("/sort", methods=["GET", "POST"])
