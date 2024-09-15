@@ -32,7 +32,7 @@ def get_games_played_for_user(username):
 
 
 def parse_bgg_xml(xml_data):
-    games = []
+    games_dict = {}
     try:
         root = defused_fromstring(xml_data)
         for item in root.findall("item"):
@@ -40,10 +40,12 @@ def parse_bgg_xml(xml_data):
             name = item.find("name").text
             image = item.find("image").text if item.find("image") is not None else ""
 
-            games.append({"id": game_id, "name": name, "image": image})
+            # Use the game_id as the key in the dictionary
+            games_dict[game_id] = {"id": game_id, "name": name, "image": image}
 
-        logger.debug(f"Successfully parsed {len(games)} games from XML")
+        logger.debug(f"Successfully parsed {len(games_dict)} unique games from XML")
     except Exception as e:
         logger.error(f"Error parsing XML data: {e}")
 
-    return games
+    # Convert the dictionary values to a list
+    return list(games_dict.values())
