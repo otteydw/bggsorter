@@ -1,0 +1,51 @@
+# Python specific
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+*.log
+*.pot
+*.pyc
+*.mypy_cache/
+*.coverage
+.cache
+coverage.xml
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environment Variables
+.env
+
+# Flask specific
+instance/
+*.sqlite3
+*.db
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore virtual environments
+env/
+venv/
+ENV/
+
+# Pytest caches
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+*.pyo
+
+# Ignore the saved state and export files
+data/save_state.json
+exported_results/
