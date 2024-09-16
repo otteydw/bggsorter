@@ -219,7 +219,8 @@ def sort_games():
 
     This route function manages the interactive sorting of games for a given user.
     It handles both GET and POST requests, implementing a binary insertion sort
-    algorithm to organize games based on user preferences.
+    algorithm to organize games based on user preferences. It also allows skipping
+    games, including the first game.
 
     Args:
         None
@@ -229,7 +230,7 @@ def sort_games():
             - If all games are sorted: A success message.
             - If username is missing: An error message with 400 status code.
             - During sorting process: Rendered 'sort_games.html' template for user input.
-            - After inserting a game: Redirect to this route for the next comparison.
+            - After inserting or skipping a game: Redirect to this route for the next comparison.
 
     Raises:
         None
@@ -238,6 +239,8 @@ def sort_games():
     Methods: GET, POST
     Query Parameters:
         username (str): The username of the user whose games are being sorted.
+        skip (str, optional): If present, indicates the current game should be skipped.
+        add_first (str, optional): If present, indicates the first game should be added to the sorted list.
     Form Data (POST only):
         username (str): The username (redundant with query parameter).
         low (int): The lower bound of the current sorting range.
@@ -245,8 +248,9 @@ def sort_games():
 
     Notes:
         - This function implements a binary insertion sort algorithm.
-        - It saves the updated sorting progress after each insertion.
-        - If the sorted list is empty, it initializes it with the first unsorted game.
+        - It saves the updated sorting progress after each insertion or skip.
+        - The user is prompted to add or skip the first game when the sorted list is empty.
+        - Skipped games are stored in a separate 'skipped' list in the user data.
     """
 
     username = request.args.get("username") or request.form.get("username")
@@ -256,23 +260,35 @@ def sort_games():
     user_data = load_data(username)
     unsorted_games = user_data["unsorted"]
     sorted_games = user_data["sorted"]
+    skipped_games = user_data.get("skipped", [])
 
     if not unsorted_games:
         return "All games have been sorted!"
 
-    # Ensure the sorted list will contain at least one game to start.
+    # Check if we're adding the first game
+    if not sorted_games and "add_first" in request.args:
+        sorted_games.append(unsorted_games.pop(0))
+        save_data(username, user_data)
+        return redirect(url_for("sort_games", username=username))
+
+    # Check if we're skipping a game
+    if "skip" in request.args:
+        skipped_game = unsorted_games.pop(0)
+        skipped_games.append(skipped_game)
+        user_data["skipped"] = skipped_games
+        save_data(username, user_data)
+        return redirect(url_for("sort_games", username=username))
+
+    # If sorted_games is empty, prompt to add or skip the first game
     if not sorted_games:
-        sorted_games.append(unsorted_games.pop())
+        return render_template("sort_first_game.html", username=username, first_game=unsorted_games[0])
 
-    game = unsorted_games[-1]
-
+    game = unsorted_games[0]
     low = int(request.form.get("low", 0))
     high = int(request.form.get("high", len(sorted_games) - 1))
 
     if low <= high:
         mid = (low + high) // 2
-
-        # This is where we ask the user to compare game with sorted_games[mid]
         return render_template(
             "sort_games.html",
             username=username,
@@ -285,7 +301,7 @@ def sort_games():
         )
     else:
         sorted_games.insert(low, game)
-        unsorted_games.pop()
+        unsorted_games.pop(0)
         save_data(username, user_data)
         return redirect(url_for("sort_games", username=username))
 

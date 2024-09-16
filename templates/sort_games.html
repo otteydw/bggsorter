@@ -10,6 +10,7 @@
         .game { text-align: center; }
         .game img { max-width: 200px; height: auto; }
         .game-name { margin-top: 10px; font-size: 1.2em; }
+        h1, p { text-align: center; }
         </style>
     </head>
     <body>
@@ -26,6 +27,8 @@
                         <img src="{{ current_game.image }}" alt="{{ current_game.name }}">
                     </button>
                     <div class="game-name">{{ current_game.name }}</div>
+                    <a href="{{ url_for('sort_games', username=username, skip=1) }}"
+                       class="btn btn-secondary">Skip this game</a>
                 </form>
             </div>
             {% if comparison_game %}
@@ -45,13 +48,11 @@
             {% endif %}
         </div>
         <h2>Debug info:</h2>
-        <p>
-            Low: {{ low }}
-            <br>
-            Mid: {{ mid }}
-            <br>
-            High: {{ high }}
-        </p>
+        Low: {{ low }}
+        <br>
+        Mid: {{ mid }}
+        <br>
+        High: {{ high }}
         <h2>Current Sorted List:</h2>
         <ul>
             {% for game in sorted_games %}<li>{{ loop.index - 1 }} - {{ game.name }}</li>{% endfor %}
