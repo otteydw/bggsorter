@@ -1,0 +1,76 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+h1,
+p {
+    text-align: center;
+}
+
+/* Container for game comparison */
+.container {
+    column-gap: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Individual game styles */
+.game {
+    text-align: center;
+}
+
+.game img {
+    height: auto;
+    max-width: 340px;
+}
+
+.game-name {
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+/* Debug info and sorted list styles */
+.debug-info,
+.sorted-list {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Sorted list specific styles */
+.sorted-list ul {
+    display: inline-block;
+    padding-left: 0;
+    text-align: left;
+}
+
+.sorted-list li {
+    list-style-type: none;
+}
+
+/* Button styles */
+.btn {
+    background-color: #007bff;
+    border-radius: 5px;
+    color: white;
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+}
