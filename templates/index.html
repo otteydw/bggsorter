@@ -4,30 +4,33 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Board Game Selector</title>
+        <link rel="stylesheet"
+              type="text/css"
+              href="{{ url_for('static', filename='styles.css') }}">
     </head>
     <body>
-        <h1>Enter Your BGG Username</h1>
-        <form action="/" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <fieldset>
-                <legend>Select Game Order:</legend>
-                <label>
-                    <input type="radio" name="order" value="default" checked>
-                    Default
-                </label>
-                <br>
-                <label>
-                    <input type="radio" name="order" value="random">
-                    Random
-                </label>
-                <br>
-                <label>
-                    <input type="radio" name="order" value="sorted">
-                    Sorted
-                </label>
-            </fieldset>
-            <button type="submit">Submit</button>
-        </form>
+        <div class="form-container">
+            <h1>Enter Your BGG Username</h1>
+            <form action="/" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <fieldset>
+                    <legend>Select Game Order:</legend>
+                    <label>
+                        <input type="radio" name="order" value="default" checked>
+                        Default
+                    </label>
+                    <label>
+                        <input type="radio" name="order" value="random">
+                        Random
+                    </label>
+                    <label>
+                        <input type="radio" name="order" value="sorted">
+                        Sorted
+                    </label>
+                </fieldset>
+                <button type="submit" class="btn">Submit</button>
+            </form>
+        </div>
     </body>
 </html>

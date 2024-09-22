@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BGG Sorter - Menu</title>
+        <link rel="stylesheet"
+              type="text/css"
+              href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <h1>BGG Sorter Menu for {{ username }}</h1>
+        <div class="container">
+            <a href="{{ url_for('sort_games', username=username) }}" class="btn btn">Sort Games</a>
+            <a href="{{ url_for('games', username=username) }}" class="btn btn">View All Games</a>
+            <a href="{{ url_for('top_games', username=username) }}" class="btn">View Top Games</a>
+        </div>
+    </body>
+</html>

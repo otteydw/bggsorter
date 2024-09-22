@@ -22,8 +22,10 @@
                     </button>
                     <div class="game-name">{{ first_game.name }}</div>
                 </form>
-                <button onclick="location.href='{{ url_for('sort_games', username=username, add_first=1) }}'">Add this game</button>
-                <button onclick="location.href='{{ url_for('sort_games', username=username, skip=1) }}'">Skip this game</button>
+                <a href="{{ url_for('sort_games', username=username, add_first=1) }}"
+                   class="btn btn-secondary">Add this game</a>
+                <a href="{{ url_for('sort_games', username=username, skip=1) }}"
+                   class="btn btn-secondary">Skip this game</a>
             </div>
         </div>
     </body>

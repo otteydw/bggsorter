@@ -156,8 +156,26 @@ def index():
                         {"id": game["id"], "name": game["name"], "image": game["image"]} for game in games
                     ]
                     save_data(username, user_data)
-            return redirect(url_for("sort_games", username=username))
+            return redirect(url_for("menu", username=username))
     return render_template("index.html")
+
+
+@app.route("/menu")
+def menu():
+    """Display a menu of available routes for the application.
+
+    This route function handles GET requests to display a menu of links
+    to other applicable routes in the application. It doesn't require any
+    parameters, but some links will need a username to function properly.
+
+    Returns:
+        str: Rendered 'menu.html' template with links to other routes.
+
+    Route: /menu
+    Methods: GET
+    """
+    username = request.args.get("username")
+    return render_template("menu.html", username=username)
 
 
 @app.route("/games")
