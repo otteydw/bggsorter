@@ -145,11 +145,12 @@ def index():
 
     if request.method == "POST":
         username = request.form.get("username")
+        order = request.form.get("order", "")
         if username:
             user_data = load_data(username)
             if not user_data["unsorted"]:
                 # Fetch and store data if not already stored
-                games = get_games_played_for_user(username)
+                games = get_games_played_for_user(username, order=order)
                 if games:
                     user_data["unsorted"] = [
                         {"id": game["id"], "name": game["name"], "image": game["image"]} for game in games

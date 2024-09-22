@@ -12,6 +12,7 @@ Note:
 """
 
 import logging
+import random
 
 import requests
 import requests_cache
@@ -26,15 +27,19 @@ session.verify = False  # Disable SSL verification
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 
-def get_games_played_for_user(username):
+def get_games_played_for_user(username, order="default"):
     """
     Fetch the list of played games for a given BoardGameGeek user.
 
     This function sends a request to the BGG XML API2 to retrieve the collection
-    of games that the specified user has marked as played.
+    of games that the specified user has marked as played. The order of games can
+    be default (as fetched), random, or sorted by game name.
 
     Args:
         username (str): The BoardGameGeek username to fetch games for.
+        order (str): The order in which to return the games. Options are:
+                     'default' (as fetched), 'random' (random order),
+                     or 'sorted' (sorted alphabetically by game name).
 
     Returns:
         list or None: A list of dictionaries containing game information if successful,
@@ -57,6 +62,15 @@ def get_games_played_for_user(username):
 
         games = parse_bgg_xml(response.content)
         logger.debug(f"Parsed {len(games)} games for user {username}")
+
+        # Process the ordering
+        if order == "random":
+            random.shuffle(games)
+            logger.debug(f"Games shuffled randomly for user {username}")
+        elif order == "sorted":
+            games.sort(key=lambda game: game["name"])  # Assuming games have a "name" key
+            logger.debug(f"Games sorted alphabetically for user {username}")
+
         return games
 
     except requests.exceptions.RequestException as e:
