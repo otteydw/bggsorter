@@ -24,6 +24,7 @@ Note:
 
 import json
 import logging
+import math
 import os
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -97,6 +98,25 @@ def save_data(username, data):
     file_path = os.path.join(DATA_DIR, f"{username}.json")
     with open(file_path, "w") as file:
         json.dump(data, file)
+
+
+def max_comparisons(n):
+    """
+    Calculate the maximum number of comparisons needed to insert a game into a sorted list.
+
+    This function computes the maximum number of binary comparisons required to insert a new
+    game into a sorted list of length `n`, following a binary insertion sort algorithm.
+
+    Args:
+        n (int): The length of the sorted list into which the game is being inserted.
+
+    Returns:
+        int: The maximum number of comparisons needed for the insertion.
+
+    Raises:
+        ValueError: If `n` is negative, as a list cannot have a negative length.
+    """
+    return math.ceil(math.log2(n + 1))
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -286,6 +306,7 @@ def sort_games():
     game = unsorted_games[0]
     low = int(request.form.get("low", 0))
     high = int(request.form.get("high", len(sorted_games) - 1))
+    current_comparison_count = int(request.form.get("current_comparison_count", 0)) + 1
 
     if low <= high:
         mid = (low + high) // 2
@@ -297,6 +318,8 @@ def sort_games():
             low=low,
             mid=mid,
             high=high,
+            current_comparison_count=current_comparison_count,
+            max_comparisons=max_comparisons(len(sorted_games)),
             sorted_games=sorted_games,
         )
     else:

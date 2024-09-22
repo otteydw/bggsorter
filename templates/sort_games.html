@@ -19,6 +19,9 @@
                     <input type="hidden" name="current_game" value="{{ current_game.id }}">
                     <input type="hidden" name="low" value="{{ low }}">
                     <input type="hidden" name="high" value="{{ mid - 1 }}">
+                    <input type="hidden"
+                           name="current_comparison_count"
+                           value="{{ current_comparison_count }}">
                     <button type="submit" style="border: none; background: none;">
                         <img src="{{ current_game.image }}" alt="{{ current_game.name }}">
                     </button>
@@ -35,6 +38,9 @@
                         <input type="hidden" name="current_game" value="{{ current_game.id }}">
                         <input type="hidden" name="low" value="{{ mid + 1 }}">
                         <input type="hidden" name="high" value="{{ high }}">
+                        <input type="hidden"
+                               name="current_comparison_count"
+                               value="{{ current_comparison_count }}">
                         <button type="submit" style="border: none; background: none;">
                             <img src="{{ comparison_game.image }}" alt="{{ comparison_game.name }}">
                         </button>
@@ -50,6 +56,8 @@
             Mid: {{ mid }}
             <br>
             High: {{ high }}
+            <br>
+            Comparison: {{ current_comparison_count }} / {{ max_comparisons }} (Max)
         </div>
         <div class="sorted-list">
             <h2>Current Sorted List:</h2>
