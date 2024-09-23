@@ -119,48 +119,34 @@ def max_comparisons(n):
     return math.ceil(math.log2(n + 1))
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
-    """Handle the index page for both GET and POST requests.
+    """Handle the index page for both GET and POST requests."""
 
-    This route function serves as the entry point for the application. It handles
-    both GET and POST requests. For GET requests, it displays the index page. For
-    POST requests, it processes the submitted username, loads or fetches user data,
-    and redirects to the game sorting page.
-
-    Args:
-        None
-
-    Returns:
-        Union[str, werkzeug.wrappers.Response]: For GET requests or POST requests
-        without a username, returns the rendered index.html template. For POST
-        requests with a valid username, returns a redirect to the sort_games route.
-
-    Raises:
-        None
-
-    Route: /
-    Methods: GET, POST
-    """
-
-    if request.method == "POST":
-        username = request.form.get("username")
-        order = request.form.get("order", "")
-        if username:
-            user_data = load_data(username)
-            if not user_data["unsorted"]:
-                # Fetch and store data if not already stored
-                games = get_games_played_for_user(username, order=order)
-                if games:
-                    user_data["unsorted"] = [
-                        {"id": game["id"], "name": game["name"], "image": game["image"]} for game in games
-                    ]
-                    save_data(username, user_data)
-            return redirect(url_for("menu", username=username))
     return render_template("index.html")
 
 
-@app.route("/menu")
+@app.route("/load", methods=["GET", "POST"])
+def load():
+    """Handle the loading of user data based on selected order."""
+    username = request.args.get("username") or request.form.get("username")
+
+    if request.method == "POST":
+        order = request.form.get("order", "default")
+        user_data = load_data(username)
+
+        # Fetch and store data if not already stored
+        games = get_games_played_for_user(username, order=order)
+        if games:
+            user_data["unsorted"] = [{"id": game["id"], "name": game["name"], "image": game["image"]} for game in games]
+            save_data(username, user_data)
+
+        return redirect(url_for("menu", username=username))
+
+    return render_template("load.html", username=username)
+
+
+@app.route("/menu", methods=["GET", "POST"])
 def menu():
     """Display a menu of available routes for the application.
 
@@ -174,7 +160,14 @@ def menu():
     Route: /menu
     Methods: GET
     """
-    username = request.args.get("username")
+    username = request.args.get("username") or request.form.get("username")
+    if not username:
+        return "Username required", 400
+    if request.method == "POST":
+        user_data = load_data(username)
+        if not user_data["unsorted"]:
+            # Redirect to the load_data route if no unsorted data exists
+            return redirect(url_for("load", username=username))
     return render_template("menu.html", username=username)
 
 

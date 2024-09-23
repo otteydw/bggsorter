@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Load Data</title>
+        <link rel="stylesheet"
+              type="text/css"
+              href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <h1>Load Data for {{ username }}</h1>
+        <p>No data was found for this user. Please choose how you would like the data loaded from BGG.</p>
+        <div class="form-container">
+            <form action="/load?username={{ username }}" method="post">
+                <fieldset>
+                    <legend>Select Game Order:</legend>
+                    <label>
+                        <input type="radio" name="order" value="default" checked>
+                        Default
+                    </label>
+                    <label>
+                        <input type="radio" name="order" value="random">
+                        Random
+                    </label>
+                    <label>
+                        <input type="radio" name="order" value="sorted">
+                        Sorted
+                    </label>
+                </fieldset>
+                <button type="submit">Load Data</button>
+            </form>
+        </div>
+    </body>
+</html>
