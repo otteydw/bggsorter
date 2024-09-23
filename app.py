@@ -237,10 +237,11 @@ def top_games():
 
     user_data = load_data(username)
 
-    max = int(request.args.get("max", None))
+    max = request.args.get("max", None)
     if max is None:
-        title = f"Top Games for {username}ß"
+        title = f"Top Games for {username}"
     else:
+        max = int(max)
         title = f"Top {max} Games for {username}"
     return render_template("top_games.html", title=title, max=max, games=user_data["sorted"][:max])
 
