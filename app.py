@@ -256,6 +256,7 @@ def games():
 
     user_data = load_data(username)
     all_games = user_data["unsorted"] + user_data["sorted"]
+    all_games.sort(key=lambda game: game["name"])  # Assuming games have a "name" key
     return render_template("games.html", games=all_games)
 
 
