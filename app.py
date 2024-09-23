@@ -121,14 +121,55 @@ def max_comparisons(n):
 
 @app.route("/", methods=["GET"])
 def index():
-    """Handle the index page for both GET and POST requests."""
+    """Display the index page of the application.
+
+    This route function handles GET requests to display the index page of the
+    application. It serves as the entry point for users.
+
+    Args:
+        None
+
+    Returns:
+        str: A rendered 'index.html' template.
+
+    Raises:
+        None
+
+    Route: /
+    Methods: GET
+    Query Parameters:
+        None
+    """
 
     return render_template("index.html")
 
 
 @app.route("/load", methods=["GET", "POST"])
 def load():
-    """Handle the loading of user data based on selected order."""
+    """Load user data and fetch games played by the user.
+
+    This route function handles both GET and POST requests to load user data and
+    fetch games played by the user. It requires a 'username' parameter, either as
+    a query parameter or form data.
+
+    Args:
+        None
+
+    Returns:
+        Union[str, werkzeug.wrappers.Response]:
+            - For GET requests: Returns a rendered 'load.html' template with the username.
+            - For POST requests: Redirects to the menu page after loading and saving user data.
+
+    Raises:
+        None
+
+    Route: /load
+    Methods: GET, POST
+    Query/Form Parameters:
+        username (str): The username of the user whose data is to be loaded.
+        order (str, optional): The order in which to fetch games (POST only, default is "default").
+    """
+
     username = request.args.get("username") or request.form.get("username")
 
     if request.method == "POST":
@@ -148,18 +189,32 @@ def load():
 
 @app.route("/menu", methods=["GET", "POST"])
 def menu():
-    """Display a menu of available routes for the application.
+    """Display a menu of available options for the application.
 
-    This route function handles GET requests to display a menu of links
-    to other applicable routes in the application. It doesn't require any
-    parameters, but some links will need a username to function properly.
+    This route function handles both GET and POST requests to display a menu of
+    options for the user. It requires a 'username' parameter, either as a query
+    parameter or form data.
+
+    Args:
+        None
 
     Returns:
-        str: Rendered 'menu.html' template with links to other routes.
+        Union[str, Tuple[str, int], werkzeug.wrappers.Response]:
+            - If a valid username is provided:
+                - For GET requests: Returns a rendered 'menu.html' template.
+                - For POST requests: If no unsorted data exists, returns a redirect
+                  to the load route. Otherwise, returns a rendered 'menu.html' template.
+            - If no username is provided: Returns an error message with a 400 status code.
+
+    Raises:
+        None
 
     Route: /menu
-    Methods: GET
+    Methods: GET, POST
+    Query/Form Parameters:
+        username (str): The username of the user accessing the menu.
     """
+
     username = request.args.get("username") or request.form.get("username")
     if not username:
         return "Username required", 400
@@ -248,42 +303,36 @@ def top_games():
 
 @app.route("/sort", methods=["GET", "POST"])
 def sort_games():
-    """Handle the game sorting process for a user.
+    """Sort games for a given user.
 
-    This route function manages the interactive sorting of games for a given user.
-    It handles both GET and POST requests, implementing a binary insertion sort
-    algorithm to organize games based on user preferences. It also allows skipping
-    games, including the first game.
+    This route function handles both GET and POST requests to sort games for a
+    specified user. It requires a 'username' parameter, either as a query parameter
+    or form data.
 
     Args:
         None
 
     Returns:
-        Union[str, werkzeug.wrappers.Response]:
-            - If all games are sorted: A success message.
-            - If username is missing: An error message with 400 status code.
-            - During sorting process: Rendered 'sort_games.html' template for user input.
-            - After inserting or skipping a game: Redirect to this route for the next comparison.
+        Union[str, Tuple[str, int], werkzeug.wrappers.Response]:
+            - If a valid username is provided:
+                - If all games are sorted: Returns a success message.
+                - If sorting the first game: Returns a rendered 'sort_first_game.html' template.
+                - During sorting: Returns a rendered 'sort_games.html' template.
+                - After inserting a game: Returns a redirect to the sort_games route.
+            - If no username is provided: Returns an error message with a 400 status code.
 
     Raises:
         None
 
     Route: /sort
     Methods: GET, POST
-    Query Parameters:
+    Query/Form Parameters:
         username (str): The username of the user whose games are being sorted.
-        skip (str, optional): If present, indicates the current game should be skipped.
-        add_first (str, optional): If present, indicates the first game should be added to the sorted list.
-    Form Data (POST only):
-        username (str): The username (redundant with query parameter).
-        low (int): The lower bound of the current sorting range.
-        high (int): The upper bound of the current sorting range.
-
-    Notes:
-        - This function implements a binary insertion sort algorithm.
-        - It saves the updated sorting progress after each insertion or skip.
-        - The user is prompted to add or skip the first game when the sorted list is empty.
-        - Skipped games are stored in a separate 'skipped' list in the user data.
+        add_first (str, optional): Flag to add the first game to the sorted list.
+        skip (str, optional): Flag to skip the current game.
+        low (int, optional): Lower bound for binary search.
+        high (int, optional): Upper bound for binary search.
+        current_comparison_count (int, optional): Number of comparisons made so far.
     """
 
     username = request.args.get("username") or request.form.get("username")
