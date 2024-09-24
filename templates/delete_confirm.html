@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Confirm Deletion{% endblock %}
+{% block content %}
+    <h1>Confirm Deletion</h1>
+    <p>
+        Are you sure you want to delete all data for user <strong>{{ username }}</strong>?
+    </p>
+    <div class="container">
+        <form method="post" action="">
+            <button type="submit" name="confirm" value="yes">Confirm</button>
+            <button type="button" onclick="window.history.back()">Cancel</button>
+        </form>
+    </div>
+{% endblock %}

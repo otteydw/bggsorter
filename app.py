@@ -100,6 +100,26 @@ def save_data(username, data):
         json.dump(data, file)
 
 
+def delete_data(username):
+    """Delete user data from a JSON file.
+
+    This function takes a username and deletes the corresponding JSON file from
+    the directory specified by DATA_DIR.
+
+    Args:
+        username (str): The username of the user whose data is being deleted.
+
+    Returns:
+        None
+
+    Raises:
+        IOError: If there's an issue deleting the file.
+    """
+    file_path = os.path.join(DATA_DIR, f"{username}.json")
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+
 def max_comparisons(n):
     """
     Calculate the maximum number of comparisons needed to insert a game into a sorted list.
@@ -152,6 +172,46 @@ def index():
         return redirect(url_for("load", username=username))
 
     return redirect(url_for("games", username=username))
+
+
+@app.route("/delete", methods=["GET", "POST"])
+def delete():
+    """Handle user data deletion confirmation or completion.
+
+    This route function handles both GET and POST requests to manage user data deletion.
+    On a GET request or if no confirmation is provided in a POST request, it displays
+    a confirmation page asking the user to confirm whether they want to delete the data.
+    On receiving a POST request with a confirmation, it deletes the user's data.
+
+    Args:
+        None
+
+    Returns:
+        str: A "Username required" message with a 400 status if no username is provided.
+        str: A rendered 'delete_confirm.html' template if no confirmation is provided.
+        str: A rendered 'delete_complete.html' template after successfully deleting data.
+
+    Raises:
+        None
+
+    Route: /delete
+    Methods: GET, POST
+    Query Parameters:
+        username (str, optional): The username of the user whose data is to be deleted.
+    Form Data:
+        confirm (str, optional): A confirmation from the user ('yes' indicates data deletion).
+    """
+    username = request.args.get("username") or request.form.get("username")
+
+    if not username:
+        return "Username required", 400
+
+    confirm = request.form.get("confirm")
+    if not confirm == "yes":
+        return render_template("delete_confirm.html", username=username)
+
+    delete_data(username)
+    return render_template("delete_complete.html", username=username)
 
 
 @app.route("/load", methods=["GET", "POST"])

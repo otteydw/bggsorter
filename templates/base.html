@@ -19,6 +19,7 @@
                 <a href="{{ url_for('games', username=username) }}">View All Games</a>
                 <a href="{{ url_for('top_games', username=username) }}">View Top Games</a>
                 <a href="{{ url_for("index") }}">Switch User</a>
+                <a href="{{ url_for("delete", username=username) }}">Delete Data</a>
             </nav>
         </header>
         <!-- Main content -->
