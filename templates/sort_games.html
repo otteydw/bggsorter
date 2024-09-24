@@ -16,7 +16,11 @@
                 <button type="submit" style="border: none; background: none;">
                     <img src="{{ current_game.image }}" alt="{{ current_game.name }}">
                 </button>
-                <div class="game-name">{{ current_game.name }}</div>
+                <div class="game-name">
+                    <a href="{{ current_game.url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">{{ current_game.name }}</a>
+                </div>
             </form>
             <a href="{{ url_for('sort_games', username=username, skip=1) }}"
                class="btn btn-secondary">Skip this game</a>
@@ -35,7 +39,11 @@
                     <button type="submit" style="border: none; background: none;">
                         <img src="{{ comparison_game.image }}" alt="{{ comparison_game.name }}">
                     </button>
-                    <div class="game-name">{{ comparison_game.name }}</div>
+                    <div class="game-name">
+                        <a href="{{ comparison_game.url }}"
+                           target="_blank"
+                           rel="noopener noreferrer">{{ comparison_game.name }}</a>
+                    </div>
                 </form>
             </div>
         {% endif %}

@@ -189,7 +189,9 @@ def load():
         # Fetch and store data if not already stored
         games = get_games_played_for_user(username, order=order)
         if games:
-            user_data["unsorted"] = [{"id": game["id"], "name": game["name"], "image": game["image"]} for game in games]
+            user_data["unsorted"] = [
+                {"id": game["id"], "name": game["name"], "image": game["image"], "url": game["url"]} for game in games
+            ]
             save_data(username, user_data)
 
         return redirect(url_for("games", username=username))

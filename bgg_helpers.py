@@ -106,9 +106,10 @@ def parse_bgg_xml(xml_data):
             game_id = int(item.get("objectid"))
             name = item.find("name").text
             image = item.find("image").text if item.find("image") is not None else ""
+            url = boardgame_url(game_id)
 
             # Use the game_id as the key in the dictionary
-            games_dict[game_id] = {"id": game_id, "name": name, "image": image}
+            games_dict[game_id] = {"id": game_id, "name": name, "image": image, "url": url}
 
         logger.debug(f"Successfully parsed {len(games_dict)} unique games from XML")
     except Exception as e:
@@ -116,3 +117,22 @@ def parse_bgg_xml(xml_data):
 
     # Convert the dictionary values to a list
     return list(games_dict.values())
+
+
+def boardgame_url(id):
+    """
+    Generates a BoardGameGeek URL for a given board game ID.
+
+    This function constructs the URL to the BoardGameGeek webpage for a specific
+    board game using its unique identifier.
+
+    Args:
+        id (int): The unique identifier of the board game.
+
+    Returns:
+        str: The URL of the board game on BoardGameGeek.
+
+    Raises:
+        None
+    """
+    return f"https://boardgamegeek.com/boardgame/{id}/"

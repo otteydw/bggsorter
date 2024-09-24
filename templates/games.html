@@ -5,8 +5,10 @@
     <ul class="game-grid">
         {% for game in games %}
             <li class="game-item">
-                <img src="{{ game.image }}" alt="{{ game.name }}">
-                <p>{{ game.name }}</p>
+                <a href="{{ game.url }}" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ game.image }}" alt="{{ game.name }}">
+                    <p>{{ game.name }}</p>
+                </a>
             </li>
         {% endfor %}
     </ul>

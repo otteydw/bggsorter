@@ -6,8 +6,10 @@
         {% for game in games %}
             <li class="game-item">
                 <p class="game-number">#{{ loop.index }}</p>
-                <img src="{{ game.image }}" alt="{{ game.name }}">
-                <p>{{ game.name }}</p>
+                <a href="{{ game.url }}" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ game.image }}" alt="{{ game.name }}">
+                    <p>{{ game.name }}</p>
+                </a>
             </li>
         {% endfor %}
     </ul>

@@ -11,7 +11,9 @@
                 <button type="submit" style="border: none; background: none;">
                     <img src="{{ first_game.image }}" alt="{{ first_game.name }}">
                 </button>
-                <div class="game-name">{{ first_game.name }}</div>
+                <div class="game-name">
+                    <a href="{{ first_game.url }}" target="_blank" rel="noopener noreferrer">{{ first_game.name }}</a>
+                </div>
             </form>
             <a href="{{ url_for('sort_games', username=username, add_first=1) }}"
                class="btn btn-secondary">Add this game</a>
