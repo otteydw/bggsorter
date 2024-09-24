@@ -1,0 +1,44 @@
+/* Header styles */
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
+}
+
+.navbar a {
+    background-color: #444;
+    border-radius: 5px;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.navbar a:hover {
+    background-color: #555;
+}
+
+@media (min-width: 800px) {
+    .navbar {
+        justify-content: center;
+    }
+
+    .navbar a {
+        margin: 0 15px;
+    }
+}
+
+main {
+    padding-top: 60px;
+}

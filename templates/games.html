@@ -1,22 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>All Games</title>
-        <link rel="stylesheet"
-              type="text/css"
-              href="{{ url_for('static', filename='gamelist.css') }}">
-    </head>
-    <body>
-        <h1>All Games ({{ games | length }})</h1>
-        <ul class="game-grid">
-            {% for game in games %}
-                <li class="game-item">
-                    <img src="{{ game.image }}" alt="{{ game.name }}">
-                    <p>{{ game.name }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}All Games{% endblock %}
+{% block content %}
+    <h1>All Games ({{ games | length }})</h1>
+    <ul class="game-grid">
+        {% for game in games %}
+            <li class="game-item">
+                <img src="{{ game.image }}" alt="{{ game.name }}">
+                <p>{{ game.name }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -119,29 +119,39 @@ def max_comparisons(n):
     return math.ceil(math.log2(n + 1))
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])
 def index():
-    """Display the index page of the application.
+    """Display the index page of the application or redirect based on user data.
 
-    This route function handles GET requests to display the index page of the
-    application. It serves as the entry point for users.
+    This route function handles GET and POST requests. On a GET request, it
+    displays the index page. On a POST request (or if a `username` query
+    parameter is provided), it checks for user data and redirects the user
+    to the appropriate page based on whether unsorted data exists.
 
     Args:
         None
 
     Returns:
-        str: A rendered 'index.html' template.
+        str: A rendered 'index.html' template if no username is provided.
+        werkzeug.wrappers.Response: A redirect to the 'load' or 'games' route based on user data.
 
     Raises:
         None
 
     Route: /
-    Methods: GET
+    Methods: GET, POST
     Query Parameters:
-        None
+        username (str, optional): The username used to load user-specific data.
     """
+    username = request.args.get("username") or request.form.get("username")
+    if not username:
+        return render_template("index.html")
 
-    return render_template("index.html")
+    user_data = load_data(username)
+    if not user_data["unsorted"]:
+        return redirect(url_for("load", username=username))
+
+    return redirect(url_for("games", username=username))
 
 
 @app.route("/load", methods=["GET", "POST"])
@@ -158,7 +168,7 @@ def load():
     Returns:
         Union[str, werkzeug.wrappers.Response]:
             - For GET requests: Returns a rendered 'load.html' template with the username.
-            - For POST requests: Redirects to the menu page after loading and saving user data.
+            - For POST requests: Redirects to the games page after loading and saving user data.
 
     Raises:
         None
@@ -182,48 +192,9 @@ def load():
             user_data["unsorted"] = [{"id": game["id"], "name": game["name"], "image": game["image"]} for game in games]
             save_data(username, user_data)
 
-        return redirect(url_for("menu", username=username))
+        return redirect(url_for("games", username=username))
 
     return render_template("load.html", username=username)
-
-
-@app.route("/menu", methods=["GET", "POST"])
-def menu():
-    """Display a menu of available options for the application.
-
-    This route function handles both GET and POST requests to display a menu of
-    options for the user. It requires a 'username' parameter, either as a query
-    parameter or form data.
-
-    Args:
-        None
-
-    Returns:
-        Union[str, Tuple[str, int], werkzeug.wrappers.Response]:
-            - If a valid username is provided:
-                - For GET requests: Returns a rendered 'menu.html' template.
-                - For POST requests: If no unsorted data exists, returns a redirect
-                  to the load route. Otherwise, returns a rendered 'menu.html' template.
-            - If no username is provided: Returns an error message with a 400 status code.
-
-    Raises:
-        None
-
-    Route: /menu
-    Methods: GET, POST
-    Query/Form Parameters:
-        username (str): The username of the user accessing the menu.
-    """
-
-    username = request.args.get("username") or request.form.get("username")
-    if not username:
-        return "Username required", 400
-    if request.method == "POST":
-        user_data = load_data(username)
-        if not user_data["unsorted"]:
-            # Redirect to the load_data route if no unsorted data exists
-            return redirect(url_for("load", username=username))
-    return render_template("menu.html", username=username)
 
 
 @app.route("/games")
@@ -257,7 +228,7 @@ def games():
     user_data = load_data(username)
     all_games = user_data["unsorted"] + user_data["sorted"]
     all_games.sort(key=lambda game: game["name"])  # Assuming games have a "name" key
-    return render_template("games.html", games=all_games)
+    return render_template("games.html", stylesheet="gamelist.css", username=username, games=all_games)
 
 
 @app.route("/top_games")
@@ -299,7 +270,14 @@ def top_games():
     else:
         max = int(max)
         title = f"Top {max} Games for {username}"
-    return render_template("top_games.html", title=title, max=max, games=user_data["sorted"][:max])
+    return render_template(
+        "top_games.html",
+        stylesheet="gamelist.css",
+        username=username,
+        title=title,
+        max=max,
+        games=user_data["sorted"][:max],
+    )
 
 
 @app.route("/sort", methods=["GET", "POST"])

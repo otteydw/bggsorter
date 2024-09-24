@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% block title %}My Flask App{% endblock %}
+        </title>
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='header.css') }}">
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename=stylesheet|default('styles.css') ) }}">
+    </head>
+    <body>
+        <!-- Header -->
+        <header>
+            <nav class="navbar">
+                <a href="{{ url_for('sort_games', username=username) }}">Sort Games</a>
+                <a href="{{ url_for('games', username=username) }}">View All Games</a>
+                <a href="{{ url_for('top_games', username=username) }}">View Top Games</a>
+                <a href="{{ url_for("index") }}">Switch User</a>
+            </nav>
+        </header>
+        <!-- Main content -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </body>
+</html>
