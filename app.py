@@ -1,4 +1,4 @@
-"""BGG Sorter 2
+"""BGG Sorter
 
 This Flask application provides functionality to sort and manage board game collections
 for users based on their BoardGameGeek (BGG) profiles. It allows users to interactively
