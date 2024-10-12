@@ -66,13 +66,14 @@ def load_data(username):
     Example:
         >>> user_data = load_data('johndoe')
         >>> print(user_data)
-        {'unsorted': [], 'sorted': []}
+        {"skipped": [], "sorted": [], "unsorted": []}
     """
     file_path = os.path.join(DATA_DIR, f"{username}.json")
     if os.path.exists(file_path):
         with open(file_path, "r") as file:
             return json.load(file)
-    return {"unsorted": [], "sorted": []}
+    user_data = {"skipped": [], "sorted": [], "unsorted": []}
+    return user_data
 
 
 def save_data(username, data):
@@ -383,7 +384,7 @@ def sort_games():
     user_data = load_data(username)
     unsorted_games = user_data["unsorted"]
     sorted_games = user_data["sorted"]
-    skipped_games = user_data.get("skipped", [])
+    skipped_games = user_data.get("skipped")
 
     if not unsorted_games:
         return "All games have been sorted!"
