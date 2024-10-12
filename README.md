@@ -25,7 +25,7 @@
 
    ```bash
    git clone https://github.com/otteydw/bggsorter.git
-   cd bgg-sorter-2
+   cd bggsorter
    ```
 
 2. Install the required dependencies:
@@ -77,3 +77,7 @@ The app uses the public API and does not alter the data on BGG. Therefore is doe
     - A more sophisticated method for excluding expansions automatically.
     - Enhanced sorting algorithms.
     - Improved UI/UX for better interactivity.
+
+## AI Assistance
+
+While developing this app, I used AI as a helpful resource for troubleshooting, generating ideas, and refining code. AI provided suggestions for resolving coding issues and optimizing features, but all final decisions, design choices, and implementations were made by me. This blend of human creativity and AI support allowed me to enhance the app efficiently and effectively.
