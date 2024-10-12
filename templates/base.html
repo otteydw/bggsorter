@@ -16,6 +16,7 @@
         <header>
             <nav class="navbar">
                 <a href="{{ url_for('sort_games', username=username) }}">Sort Games</a>
+                <a href="{{ url_for('unskip', username=username) }}">Skipped Games</a>
                 <a href="{{ url_for('games', username=username) }}">View All Games</a>
                 <a href="{{ url_for('top_games', username=username) }}">View Top Games</a>
                 <a href="{{ url_for("index") }}">Switch User</a>

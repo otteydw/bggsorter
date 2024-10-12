@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Skipped Games{% endblock %}
+{% block content %}
+    <h1>Skipped Games ({{ games | length }})</h1>
+    <h2>Select which games to move back to the unsorted list.</h2>
+    <form method="post" action="{{ url_for("unskip") }}">
+        <input type="hidden" name="username" value="{{ username }}">
+        <ul class="game-grid">
+            {% for game in games %}
+                <li class="game-item">
+                    <a href="{{ game.url }}" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ game.image }}" alt="{{ game.name }}">
+                        <p>
+                            {{ game.name }}
+                        </a>
+                        <label>
+                            <input type="checkbox" name="selected_games" value="{{ game.id }}">
+                        </label>
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Submit Selected Games</button>
+    </form>
+{% endblock %}

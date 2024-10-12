@@ -433,5 +433,52 @@ def sort_games():
         return redirect(url_for("sort_games", username=username))
 
 
+def unskip_selected_games(username, selected_games):
+    """Unskip the selected games for a given user and moved them back to unsorted.
+
+    Args:
+        username (str): The username of the user whose games are to be unskipped.
+        selected_games (list): A list of game IDs to be unskipped.
+
+    Returns:
+        None
+    """
+    user_data = load_data(username)
+    skipped_games = user_data["skipped"]
+    unsorted_games = user_data["unsorted"]
+
+    for game_id in selected_games:
+        # print(f"Unskipping game with ID: {game_id}")
+        for game in skipped_games:
+            if game["id"] == game_id:
+                # print(f"Unskipping game: {game['name']}")
+                unsorted_games.append(game)
+                skipped_games.remove(game)
+                break
+
+    save_data(username, user_data)
+
+
+@app.route("/unskip", methods=["GET", "POST"])
+def unskip():
+
+    username = request.args.get("username") or request.form.get("username")
+    if not username:
+        return "Username required", 400
+
+    selected_games = [int(game_id) for game_id in request.form.getlist("selected_games")]
+
+    if not selected_games:
+        user_data = load_data(username)
+        skipped_games = user_data["skipped"]
+        skipped_games.sort(key=lambda game: game["name"])
+        return render_template("unskip.html", stylesheet="gamelist.css", username=username, games=skipped_games)
+
+    # print(f"Going to unskip these game ids: {selected_games}")
+    unskip_selected_games(username, selected_games)
+
+    return redirect(url_for("unskip", username=username))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
