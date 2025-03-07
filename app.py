@@ -27,7 +27,7 @@ import logging
 import math
 import os
 
-from bgg_helpers import get_games_played_for_user
+from bgg_helpers import BGGUserError, check_bgg_user_exists, get_games_played_for_user
 from flask import Flask, redirect, render_template, request, url_for
 
 logging.basicConfig(level=logging.DEBUG)
@@ -167,11 +167,16 @@ def index():
     if not username:
         return render_template("index.html")
 
-    user_data = load_data(username)
-    if not user_data["unsorted"]:
-        return redirect(url_for("load", username=username))
+    try:
+        if not check_bgg_user_exists(username):
+            return render_template("index.html", error=f"Username {username} not found on BoardGameGeek")
+        user_data = load_data(username)
+        if not user_data["unsorted"]:
+            return redirect(url_for("load", username=username))
 
-    return redirect(url_for("games", username=username))
+        return redirect(url_for("games", username=username))
+    except BGGUserError as e:
+        return render_template("index.html", error=str(e))
 
 
 @app.route("/delete", methods=["GET", "POST"])
@@ -248,6 +253,7 @@ def load():
 
         # Fetch and store data if not already stored
         games = get_games_played_for_user(username, order=order)
+
         if games:
             user_data["unsorted"] = [
                 {"id": game["id"], "name": game["name"], "image": game["image"], "url": game["url"]} for game in games

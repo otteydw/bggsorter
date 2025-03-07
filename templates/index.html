@@ -11,6 +11,7 @@
     <body>
         <div class="form-container">
             <h1>Enter Your BGG Username</h1>
+            {% if error %}<div class="error-message">{{ error }}</div>{% endif %}
             <form action="/" method="post">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>

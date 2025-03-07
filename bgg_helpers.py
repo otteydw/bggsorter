@@ -13,10 +13,16 @@ Note:
 
 import logging
 import random
+from xml.etree import ElementTree
 
 import requests
 import requests_cache
 from defusedxml.ElementTree import fromstring as defused_fromstring
+
+
+class BGGUserError(Exception):
+    pass
+
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -59,6 +65,16 @@ def get_games_played_for_user(username, order="default"):
         response = session.get(url)
         response.raise_for_status()
         logger.info(f"Received response for {username}, status code: {response.status_code}")
+
+        # Parse the XML response
+        root = ElementTree.fromstring(response.content)
+
+        # Check if the response contains an error
+        error_elem = root.find(".//error")
+        if error_elem is not None:
+            error_message = error_elem.find("message").text
+            logger.error(f"BGG API error for {username}: {error_message}")
+            raise BGGUserError(error_message)
 
         games = parse_bgg_xml(response.content)
         logger.debug(f"Parsed {len(games)} games for user {username}")
@@ -136,3 +152,38 @@ def boardgame_url(id):
         None
     """
     return f"https://boardgamegeek.com/boardgame/{id}/"
+
+
+def check_bgg_user_exists(username):
+    """
+    Check if a BGG username exists using the lightweight user endpoint.
+
+    Args:
+        username (str): The BGG username to check
+
+    Returns:
+        bool: True if user exists, False if not
+
+    Raises:
+        BGGUserError: If there's a network or API issue
+    """
+    url = f"https://boardgamegeek.com/xmlapi2/user?name={username}"
+
+    try:
+        response = session.get(url)
+        response.raise_for_status()
+        # Check if response is HTML (indicating user doesn't exist)
+        if "<h1>It appears we're missing some bits" in response.text:
+            return False
+
+        # If we got XML, try to parse it
+        try:
+            user = defused_fromstring(response.content)
+            logger.debug(f"{user=}")
+            return user is not None and "id" in user.attrib
+        except ElementTree.ParseError:
+            # If we can't parse as XML, user probably doesn't exist
+            return False
+
+    except requests.RequestException as e:
+        raise BGGUserError(f"Unable to connect to BoardGameGeek: {str(e)}")
