@@ -2,33 +2,22 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
-  - repo: https://github.com/psf/black
-    rev: 24.4.2
-    hooks:
-      - id: black
-        args: [--line-length=120]
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        name: isort (python)
-        args: ['--profile', 'black']
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.9.9
     hooks:
       # Run the linter.
       - id: ruff
-        args: [--fix]
-        # Run the formatter.
-        # - id: ruff-format
+        args: ["check", "--select", "I", "--fix"]
+      # Run the formatter.
+      - id: ruff-format
   - repo: https://github.com/djlint/djLint
-    rev: v1.34.1
+    rev: v1.36.4
     hooks:
       - id: djlint-reformat
       - id: djlint
@@ -37,14 +26,23 @@ repos:
       - id: djlint-jinja
         args: ['--ignore=H006,H021,H030,H031']
   - repo: https://github.com/google/yamlfmt
-    rev: v0.12.1
+    rev: v0.16.0
     hooks:
       - id: yamlfmt
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.13.0
+    rev: v0.17.2
     hooks:
       - id: markdownlint-cli2
-  - repo: https://github.com/pre-commit/mirrors-csslint
-    rev: v1.0.5
-    hooks:
-      - id: csslint
+# - repo: https://github.com/pre-commit/mirrors-csslint
+#   rev: v1.0.5
+#   hooks:
+#     - id: csslint
+# - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+#   rev: v14.4.0
+#   hooks:
+#     - id: stylelint
+#       additional_dependencies:
+#         - stylelint@14.4.0
+#         - stylelint-config-recommended
+#         - stylelint-config-standard
+#         - stylelint-config-standard-scss@3.0.0

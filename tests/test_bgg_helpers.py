@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from bgg_helpers import get_games_played_for_user, parse_bgg_xml
+
 from tests.test_data import MOCK_PLAYED_GAMES_XML
 
 

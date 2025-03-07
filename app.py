@@ -27,9 +27,8 @@ import logging
 import math
 import os
 
-from flask import Flask, redirect, render_template, request, url_for
-
 from bgg_helpers import get_games_played_for_user
+from flask import Flask, redirect, render_template, request, url_for
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -461,7 +460,6 @@ def unskip_selected_games(username, selected_games):
 
 @app.route("/unskip", methods=["GET", "POST"])
 def unskip():
-
     username = request.args.get("username") or request.form.get("username")
     if not username:
         return "Username required", 400
