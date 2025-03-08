@@ -509,5 +509,35 @@ def unskip():
     return redirect(url_for("unskip", username=username))
 
 
+@app.route("/game_plays/<username>/<int:game_id>")
+def game_plays(username, game_id):
+    """Display play history for a specific game.
+
+    This route function handles GET requests to display all logged plays for a
+    specific game from a user's BGG account.
+
+    Args:
+        username (str): The BGG username whose play history to display.
+        game_id (int): The BGG ID of the game to show play history for.
+
+    Returns:
+        str: A rendered 'game_plays.html' template with the play history.
+
+    Raises:
+        None
+
+    Route: /game_plays/<username>/<int:game_id>
+    Methods: GET
+    """
+    from bgg_helpers import get_plays_for_game
+
+    try:
+        plays = get_plays_for_game(username, game_id)
+        game_name = plays[0]["name"] if plays else "Unknown Game"
+        return render_template("game_plays.html", username=username, game_id=game_id, game_name=game_name, plays=plays)
+    except Exception as e:
+        return f"Error retrieving play history: {str(e)}", 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)

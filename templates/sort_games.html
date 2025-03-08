@@ -20,6 +20,9 @@
                     <a href="{{ current_game.url }}"
                        target="_blank"
                        rel="noopener noreferrer">{{ current_game.name }}</a>
+                    <a href="{{ url_for('game_plays', username=username, game_id=current_game.id) }}"
+                       target="_blank"
+                       rel="noopener noreferrer">(plays)</a>
                 </div>
             </form>
             <a href="{{ url_for('sort_games', username=username, skip=1) }}"
@@ -43,6 +46,9 @@
                         <a href="{{ comparison_game.url }}"
                            target="_blank"
                            rel="noopener noreferrer">{{ comparison_game.name }}</a>
+                        <a href="{{ url_for('game_plays', username=username, game_id=comparison_game.id) }}"
+                           target="_blank"
+                           rel="noopener noreferrer">(plays)</a>
                     </div>
                 </form>
             </div>

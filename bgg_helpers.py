@@ -187,3 +187,75 @@ def check_bgg_user_exists(username):
 
     except requests.RequestException as e:
         raise BGGUserError(f"Unable to connect to BoardGameGeek: {str(e)}")
+
+
+def get_plays_for_game(username, game_id):
+    """
+    Get all plays for a specific game from a user's BGG account.
+
+    This function sends a request to the BGG XML API2 to retrieve the play history
+    for a specific game that the specified user has logged. It includes details
+    such as play date, location, duration, and player information.
+
+    Args:
+        username (str): The BoardGameGeek username to fetch plays for.
+        game_id (int): The BGG ID of the game to fetch plays for.
+
+    Returns:
+        list: A list of dictionaries containing play information.
+              Each dictionary contains keys like 'date', 'location', 'players', etc.
+
+    Raises:
+        BGGUserError: If there's an issue with the BGG API request.
+
+    Note:
+        This function uses a cached session to improve performance and reduce API load.
+    """
+    logger.debug(f"Fetching plays for game {game_id} for user: {username}")
+    url = f"https://boardgamegeek.com/xmlapi2/plays?username={username}&id={game_id}"
+
+    try:
+        response = session.get(url)
+        response.raise_for_status()
+        logger.info(f"Received play history for game {game_id}, user {username}, status code: {response.status_code}")
+
+        # Parse the XML response
+        root = defused_fromstring(response.content)
+
+        # Check if the response contains an error
+        error_elem = root.find(".//error")
+        if error_elem is not None:
+            error_message = error_elem.find("message").text
+            logger.error(f"BGG API error for game {game_id}, user {username}: {error_message}")
+            raise BGGUserError(error_message)
+
+        plays = []
+
+        for play in root.findall(".//play"):
+            play_info = {
+                "date": play.get("date", "Unknown"),
+                "location": play.get("location", ""),
+                "length": play.get("length", ""),
+                "name": play.find(".//item").get("name", "Unknown Game")
+                if play.find(".//item") is not None
+                else "Unknown Game",
+                "players": [],
+            }
+
+            # Get player information if available
+            for player in play.findall(".//player"):
+                player_info = {
+                    "name": player.get("name", "Unknown"),
+                    "score": player.get("score", ""),
+                    "win": player.get("win") == "1",
+                }
+                play_info["players"].append(player_info)
+
+            plays.append(play_info)
+
+        logger.debug(f"Parsed {len(plays)} plays for game {game_id}, user {username}")
+        return plays
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching plays for game {game_id}, user {username}: {e}")
+        raise BGGUserError(f"Failed to retrieve plays from BGG API: {str(e)}")

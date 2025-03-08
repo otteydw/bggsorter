@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Play History for {{ game_name }}{% endblock %}
+{% block content %}
+    <div class="plays-container">
+        <h1>Play History for {{ game_name }}</h1>
+        <p>
+            <a href="{{ url_for('sort_games', username=username) }}">Back to sorting</a>
+        </p>
+        {% if plays %}
+            <div class="play-list">
+                {% for play in plays %}
+                    <div class="play-item">
+                        {% if play.players %}
+                            <details>
+                                <summary>
+                                    <span class="play-date">{{ play.date }}</span>
+                                    {% if play.location %}<span class="play-location">({{ play.location }})</span>{% endif %}
+                                </summary>
+                                <div class="players">
+                                    <h4>Players:</h4>
+                                    <ul>
+                                        {% for player in play.players %}
+                                            <li>
+                                                {{ player.name }}
+                                                {% if player.score %}- Score: {{ player.score }}{% endif %}
+                                                {% if player.win %}<span class="winner">(Winner)</span>{% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </details>
+                        {% else %}
+                            <div class="simple-play">
+                                <span class="play-date">{{ play.date }}</span>
+                                {% if play.location %}<span class="play-location">({{ play.location }})</span>{% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No play history found for this game.</p>
+        {% endif %}
+    </div>
+    <style>
+        .plays-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .play-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .play-item {
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+        }
+
+        .play-item:last-child {
+            border-bottom: none;
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            font-weight: bold;
+            padding: 5px 0;
+            list-style-position: inside;
+        }
+
+        summary::-webkit-details-marker {
+            margin-right: 10px;
+        }
+
+        .simple-play {
+            padding: 5px 0;
+        }
+
+        .play-date {
+            font-weight: bold;
+        }
+
+        .play-location {
+            font-weight: normal;
+            color: #666;
+            margin-left: 5px;
+        }
+
+        .players {
+            margin-left: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .winner {
+            color: green;
+            font-weight: bold;
+        }
+
+        h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .players ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+    </style>
+{% endblock %}

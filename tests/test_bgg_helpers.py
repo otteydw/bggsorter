@@ -3,10 +3,18 @@ Tests for the BoardGameGeek helper functions in bgg_helpers.py.
 These tests verify the functionality of fetching and parsing game data from the BGG API.
 """
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+import pytest
 import requests
-from bgg_helpers import BGGUserError, boardgame_url, check_bgg_user_exists, get_games_played_for_user, parse_bgg_xml
+from bgg_helpers import (
+    BGGUserError,
+    boardgame_url,
+    check_bgg_user_exists,
+    get_games_played_for_user,
+    get_plays_for_game,
+    parse_bgg_xml,
+)
 
 from tests.test_data import (
     MOCK_INVALID_USER_HTML,
@@ -273,3 +281,129 @@ def test_get_games_played_for_user_sorted_order(mock_get):
     assert len(games) == 2
     # Verify the games are in alphabetical order
     assert games[0]["name"] <= games[1]["name"]
+
+
+@patch("bgg_helpers.session.get")
+def test_get_plays_for_game_success(mock_get):
+    """
+    Test successful retrieval of plays for a game.
+
+    This test verifies that:
+    1. The function correctly makes an API request to BoardGameGeek
+    2. The response is properly parsed into a list of play dictionaries
+    3. The play data contains the expected values (date, location, players)
+    """
+    # Mock response with sample play data
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.content = """
+    <plays username="testuser" userid="12345" total="2" page="1" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+        <play id="12345678" date="2023-01-15" quantity="1" length="60" incomplete="0" location="Home">
+            <item name="Test Game" objecttype="thing" objectid="123456">
+                <subtypes>
+                    <subtype value="boardgame"/>
+                </subtypes>
+            </item>
+            <players>
+                <player username="testuser" userid="12345" name="Test User" startposition="" color="" score="10" new="0" rating="0" win="1"/>
+                <player name="Player 2" score="8" new="0" rating="0" win="0"/>
+            </players>
+        </play>
+        <play id="87654321" date="2023-02-20" quantity="1" incomplete="0" location="Friend's House">
+            <item name="Test Game" objecttype="thing" objectid="123456">
+                <subtypes>
+                    <subtype value="boardgame"/>
+                </subtypes>
+            </item>
+            <players>
+                <player username="testuser" userid="12345" name="Test User" score="7" win="0"/>
+                <player name="Player 2" score="12" win="1"/>
+            </players>
+        </play>
+    </plays>
+    """.encode()
+
+    mock_get.return_value = mock_response
+
+    # Call the function
+    plays = get_plays_for_game("testuser", 123456)
+
+    # Verify the results
+    assert len(plays) == 2
+
+    # Check first play
+    assert plays[0]["date"] == "2023-01-15"
+    assert plays[0]["location"] == "Home"
+    assert plays[0]["length"] == "60"
+    assert plays[0]["name"] == "Test Game"
+    assert len(plays[0]["players"]) == 2
+    assert plays[0]["players"][0]["name"] == "Test User"
+    assert plays[0]["players"][0]["score"] == "10"
+    assert plays[0]["players"][0]["win"] is True
+
+    # Check second play
+    assert plays[1]["date"] == "2023-02-20"
+    assert plays[1]["location"] == "Friend's House"
+    assert plays[1]["name"] == "Test Game"
+    assert len(plays[1]["players"]) == 2
+    assert plays[1]["players"][1]["name"] == "Player 2"
+    assert plays[1]["players"][1]["score"] == "12"
+    assert plays[1]["players"][1]["win"] is True
+
+    # Verify the API call
+    mock_get.assert_called_once_with("https://boardgamegeek.com/xmlapi2/plays?username=testuser&id=123456")
+
+
+@patch("bgg_helpers.session.get")
+def test_get_plays_for_game_no_plays(mock_get):
+    """
+    Test when a game has no plays.
+
+    This test verifies that:
+    1. The function correctly handles empty play data
+    2. The function returns an empty list when no plays are found
+    """
+    # Mock response with no plays
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.content = """
+    <plays username="testuser" userid="12345" total="0" page="1" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+    </plays>
+    """.encode()
+
+    mock_get.return_value = mock_response
+
+    # Call the function
+    plays = get_plays_for_game("testuser", 123456)
+
+    # Verify the results
+    assert len(plays) == 0
+
+    # Verify the API call
+    mock_get.assert_called_once_with("https://boardgamegeek.com/xmlapi2/plays?username=testuser&id=123456")
+
+
+@patch("bgg_helpers.session.get")
+def test_get_plays_for_game_error(mock_get):
+    """
+    Test handling of API errors.
+
+    This test verifies that:
+    1. The function correctly handles HTTP errors
+    2. The function raises a BGGUserError with appropriate message
+    """
+    # Mock response with an error
+    mock_response = MagicMock()
+    mock_response.status_code = 404
+    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Client Error")
+
+    mock_get.return_value = mock_response
+
+    # Call the function and check for exception
+    with pytest.raises(BGGUserError) as excinfo:
+        get_plays_for_game("testuser", 123456)
+
+    assert "Failed to retrieve plays from BGG API" in str(excinfo.value)
+
+    # Verify the API call
+    mock_get.assert_called_once_with("https://boardgamegeek.com/xmlapi2/plays?username=testuser&id=123456")
