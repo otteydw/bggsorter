@@ -7,9 +7,33 @@
             <li class="game-item">
                 <a href="{{ game.url }}" target="_blank" rel="noopener noreferrer">
                     <img src="{{ game.image }}" alt="{{ game.name }}">
-                    <p>{{ game.name }}</p>
                 </a>
+                <p class="game-name">
+                    <a href="{{ game.url }}" target="_blank" rel="noopener noreferrer">{{ game.name }}</a>
+                    <a href="{{ url_for('game_plays', username=username, game_id=game.id) }}" title="View play history" target="_blank" rel="noopener noreferrer" class="play-icon">🎲</a>
+                </p>
             </li>
         {% endfor %}
     </ul>
+    
+    <style>
+        .game-name {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-align: center;
+        }
+        
+        .play-icon {
+            font-size: 0.8em;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .play-icon:hover {
+            opacity: 1;
+        }
+    </style>
 {% endblock %}
