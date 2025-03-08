@@ -139,6 +139,29 @@ def max_comparisons(n):
     return math.ceil(math.log2(n + 1))
 
 
+def total_remaining_comparisons(sorted_length, unsorted_length):
+    """
+    Calculate the maximum number of remaining comparisons to sort all unsorted games.
+
+    This function computes the worst-case total number of comparisons needed to
+    insert all remaining unsorted games into the sorted list using binary insertion sort.
+
+    Args:
+        sorted_length (int): The current length of the sorted list.
+        unsorted_length (int): The number of unsorted games remaining.
+
+    Returns:
+        int: The maximum number of comparisons needed to sort all remaining games.
+    """
+    total = 0
+    for i in range(unsorted_length):
+        # For each unsorted game, we need at most ceil(log2(n+1)) comparisons
+        # where n is the current length of the sorted list
+        current_sorted_length = sorted_length + i
+        total += math.ceil(math.log2(current_sorted_length + 1))
+    return total
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """Display the index page of the application or redirect based on user data.
@@ -430,6 +453,8 @@ def sort_games():
             current_comparison_count=current_comparison_count,
             max_comparisons=max_comparisons(len(sorted_games)),
             sorted_games=sorted_games,
+            unsorted_games_count=len(unsorted_games),
+            total_remaining_comparisons=total_remaining_comparisons(len(sorted_games), len(unsorted_games)),
         )
     else:
         sorted_games.insert(low, game)

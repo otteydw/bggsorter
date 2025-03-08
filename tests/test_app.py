@@ -10,7 +10,7 @@ import tempfile
 from unittest.mock import mock_open, patch
 
 import pytest
-from app import delete_data, load_data, max_comparisons, save_data, unskip_selected_games
+from app import delete_data, load_data, max_comparisons, save_data, total_remaining_comparisons, unskip_selected_games
 
 
 @pytest.fixture
@@ -203,6 +203,28 @@ def test_max_comparisons():
     assert max_comparisons(8) == 4  # Eight items
     assert max_comparisons(15) == 4  # Fifteen items
     assert max_comparisons(16) == 5  # Sixteen items
+
+
+def test_total_remaining_comparisons():
+    """
+    Test the total_remaining_comparisons function.
+
+    This test verifies that:
+    1. The function correctly calculates the total maximum comparisons needed
+    2. The function handles various input combinations correctly
+    3. The function returns the expected values for known inputs
+    """
+    # Test with various combinations of sorted and unsorted lengths
+    assert total_remaining_comparisons(0, 0) == 0  # No games to sort
+    assert total_remaining_comparisons(0, 1) == 0  # First game (no comparisons needed)
+    assert total_remaining_comparisons(1, 1) == 1  # One sorted, one unsorted
+    assert total_remaining_comparisons(2, 1) == 2  # Two sorted, one unsorted
+    assert total_remaining_comparisons(3, 1) == 2  # Three sorted, one unsorted
+    assert total_remaining_comparisons(4, 1) == 3  # Four sorted, one unsorted
+
+    # Test with multiple unsorted games
+    assert total_remaining_comparisons(1, 2) == 1 + 2  # 1 for first, 2 for second
+    assert total_remaining_comparisons(2, 3) == 2 + 2 + 3  # 2 + 2 + 3 = 7
 
 
 def test_unskip_selected_games(temp_data_dir):
